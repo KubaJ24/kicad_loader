@@ -1,0 +1,6 @@
+{
+    "version": "0.1",
+    "source_dir": "Pobrane",
+    "sym_lib_dir": "Ścieżka do .kicad_sym",
+    "kicad_mod_dir": "Ścieżka do folderu z footprintami"
+}
