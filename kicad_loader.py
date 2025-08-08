@@ -5,7 +5,8 @@ import os
 import zipfile
 import shutil
 
-zip_file = "C:\\Users\\sim\\Downloads\\LIB_B550C-13-F.zip"
+#zip_file = "C:\\Users\\sim\\Downloads\\LIB_B550C-13-F.zip"
+downloads_dir = "C:\\Users\\sim\\Downloads"
 
 # Czytanie konfiguracji z 'config.json'
 with open("config.json", "r") as file:
@@ -22,7 +23,7 @@ allowed_extensions = tuple(data["extensions"])
 
 print("Wersja programu: ", version)
 
-# Czyszczenie folderu 
+# Czyszczenie downloads_diru 
 if os.path.exists(tmp_dir):
     for f in os.listdir(tmp_dir):
         p = os.path.join(tmp_dir, f)
@@ -36,6 +37,14 @@ if os.path.exists(tmp_dir):
             print(f"Błąd przy usuwaniu {tmp_dir}: {e}")
 else:
     os.makedirs(tmp_dir)
+
+files = [os.path.join(downloads_dir, f) for f in os.listdir(downloads_dir) if os.path.isfile(os.path.join(downloads_dir, f))]
+
+if files:
+    zip_file = max(files, key=os.path.getmtime)
+    print("Najnowszy plik to:", zip_file)
+else:
+    print("Brak plików w downloads_dirze.")
 
 # Rozpakowywanie plików do odpowiednich lokalizacji
 with zipfile.ZipFile(zip_file, 'r') as zip_ref:
@@ -71,11 +80,11 @@ with zipfile.ZipFile(zip_file, 'r') as zip_ref:
                         with zip_ref.open(name) as source, open(target_path, "wb") as target:
                             target.write(source.read())
 
-                        # Usuwanie pierwszej linii z pliku
+                        # Usuwanie pierwszej i ostatniej linii z pliku
                         with open(f"tmp/{filename}", "r") as f:
                             lines = f.readlines()
                             if lines:
-                                lines = lines[1:]
+                                lines = lines[1:-1]
                         # Zapisywanie zmian
                         with open(f"tmp/{filename}", "w") as f:
                             f.writelines(lines)
