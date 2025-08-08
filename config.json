@@ -1,6 +1,10 @@
 {
-    "version": "0.1",
-    "source_dir": "Pobrane",
-    "sym_lib_dir": "Ścieżka do .kicad_sym",
-    "kicad_mod_dir": "Ścieżka do folderu z footprintami"
+    "version": "0.2",
+    "source_dir": "C:\\Users\\sim\\Downloads",
+    "sym_lib_dir": "C:\\Programy\\KiCad 9\\lib\\SamacSys_Parts.kicad_sym",
+    "lib_dir": "C:\\Programy\\KiCad 9\\lib\\SamacSys_Parts.lib",
+    "kicad_mod_dir": "C:\\Programy\\KiCad 9\\lib\\SamacSys_Parts.pretty",
+    "3dshapes_dir": "C:\\Programy\\KiCad 9\\lib\\SamacSys_Parts.3dshapes",
+    "tmp_dir": "C:\\Users\\sim\\Desktop\\Projekty\\RPi3\\kicad_loader\\tmp",
+    "extensions": [".kicad_sym", ".kicad_mod", ".lib", ".stp", ".step"]
 }
