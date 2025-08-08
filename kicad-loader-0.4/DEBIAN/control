@@ -1,0 +1,8 @@
+Package: kicad-loader
+Version: 0.4
+Section: utils
+Priority: optional
+Architecture: all
+Depends: python3
+Maintainer: KubaJ24
+Description: kicad loader for Linux

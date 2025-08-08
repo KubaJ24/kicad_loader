@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Zmienna na nazwę i wersję
-PKG_NAME="kicad loader"
+PKG_NAME="kicad-loader"
 VERSION=$1
 PREV_VERSION=$2
 ARCH="all"
@@ -19,14 +19,11 @@ rm -R ${PKG_NAME}-${PREV_VERSION} ${PKG_NAME}-${PREV_VERSION}.deb
 
 # Struktura katalogów
 mkdir -p ${PKG_NAME}-${VERSION}/usr/bin
-mkdir -p ${PKG_NAME}-${VERSION}/UBUNTU
+mkdir -p ${PKG_NAME}-${VERSION}/DEBIAN
 
 # Kopiowanie pliku i ustawienie wykonywalności
-cp modbus_rtu_master.py ${PKG_NAME}-${VERSION}/usr/bin/modbus-rtu-master
-chmod +x ${PKG_NAME}-${VERSION}/usr/bin/modbus-rtu-master
-mkdir -p ${PKG_NAME}-${VERSION}/usr/share/doc/${PKG_NAME}
-cp README.txt ${PKG_NAME}-${VERSION}/usr/share/doc/${PKG_NAME}/
-chmod 644 ${PKG_NAME}-${VERSION}/usr/share/doc/${PKG_NAME}/README.txt
+cp kicad_loader.py ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
+chmod +x ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
 
 # Plik kontrolny
 cat <<EOF > ${PKG_NAME}-${VERSION}/DEBIAN/control
@@ -41,14 +38,14 @@ Description: kicad loader for Linux
 EOF
 
 # Skrypt postinst - instalacja minimalmodbus przez pip3
-cat <<'EOF' > ${PKG_NAME}-${VERSION}/UBUNTU/postinst
+cat <<'EOF' > ${PKG_NAME}-${VERSION}/DEBIAN/postinst
 #!/bin/bash
 set -e
 
 exit 0
 EOF
 
-chmod +x ${PKG_NAME}-${VERSION}/UBUNTU/postinst
+chmod +x ${PKG_NAME}-${VERSION}/DEBIAN/postinst
 
 # Budowanie paczki
 dpkg-deb --build ${PKG_NAME}-${VERSION}
