@@ -29,7 +29,7 @@ print("Wersja programu: ", version)
 
 while True:
     time.sleep(1)
-    # Czyszczenie downloads_diru 
+    # Czyszczenie tmp
     if os.path.exists(tmp_dir):
         for f in os.listdir(tmp_dir):
             p = os.path.join(tmp_dir, f)
@@ -50,7 +50,7 @@ while True:
         if files:
             zip_file = max(files, key=os.path.getmtime)
         else:
-            print("Brak plików w downloads_dirze.")
+            print("Brak plików w downloads_dir.")
 
         if zip_file != prev_file_name:
             print("Najnowszy plik to:", zip_file)

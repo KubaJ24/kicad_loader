@@ -20,10 +20,13 @@ rm -R ${PKG_NAME}-${PREV_VERSION} ${PKG_NAME}-${PREV_VERSION}.deb
 # Struktura katalogów
 mkdir -p ${PKG_NAME}-${VERSION}/usr/bin
 mkdir -p ${PKG_NAME}-${VERSION}/DEBIAN
+mkdir -p ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/tmp
 
 # Kopiowanie pliku i ustawienie wykonywalności
 cp kicad_loader.py ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
-chmod +x ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
+chmod +x ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/kicad_loader.py
+cp config.json ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
+chmod +rw ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/config.json
 
 # Plik kontrolny
 cat <<EOF > ${PKG_NAME}-${VERSION}/DEBIAN/control
