@@ -1,34 +1,41 @@
 #!/bin/bash
 
-# Zmienna na nazwę i wersję
 PKG_NAME="kicad-loader"
 VERSION=$1
 PREV_VERSION=$2
 ARCH="all"
 
 if [[ "$VERSION" == "--help" ]]; then
-	echo "Użycie: ./build_deb.sh <nowa_wersja> <stara_wersja>"
-	exit
+    echo "Użycie: ./build_deb.sh <nowa_wersja> <stara_wersja>"
+    exit
 fi
 
 echo "Deb builder for ${PKG_NAME}"
 
 # Czyszczenie
 rm -rf ${PKG_NAME}-${VERSION} ${PKG_NAME}-${VERSION}.deb
-rm -R ${PKG_NAME}-${PREV_VERSION} ${PKG_NAME}-${PREV_VERSION}.deb
+rm -rf ${PKG_NAME}-${PREV_VERSION} ${PKG_NAME}-${PREV_VERSION}.deb
 
 # Struktura katalogów
-mkdir -p ${PKG_NAME}-${VERSION}/usr/bin
+mkdir -p ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
 mkdir -p ${PKG_NAME}-${VERSION}/DEBIAN
-mkdir -p ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/tmp
+mkdir -p /tmp/kicad-loader-tmp
 
-# Kopiowanie pliku i ustawienie wykonywalności
-cp kicad_loader.py ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
+# Pliki aplikacji
+cp kicad_loader.py ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/
 chmod +x ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/kicad_loader.py
-cp config.json ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
+cp config.json ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/
 chmod +rw ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/config.json
+cp kicad-loader.service /etc/systemd/system/
 
-# Plik kontrolny
+# Wrapper w usr/bin
+cat <<EOF > ${PKG_NAME}-${VERSION}/usr/bin/kicad-loader
+#!/bin/bash
+python3 /usr/bin/kicad_loader/kicad_loader.py "\$@"
+EOF
+chmod +x ${PKG_NAME}-${VERSION}/usr/bin/kicad-loader
+
+# Plik control
 cat <<EOF > ${PKG_NAME}-${VERSION}/DEBIAN/control
 Package: ${PKG_NAME}
 Version: ${VERSION}
@@ -40,17 +47,15 @@ Maintainer: KubaJ24
 Description: kicad loader for Linux
 EOF
 
-# Skrypt postinst - instalacja minimalmodbus przez pip3
+# postinst
 cat <<'EOF' > ${PKG_NAME}-${VERSION}/DEBIAN/postinst
 #!/bin/bash
 set -e
-
 exit 0
 EOF
-
 chmod +x ${PKG_NAME}-${VERSION}/DEBIAN/postinst
 
 # Budowanie paczki
 dpkg-deb --build ${PKG_NAME}-${VERSION}
-
 echo "Paczka zbudowana: ${PKG_NAME}-${VERSION}.deb"
+

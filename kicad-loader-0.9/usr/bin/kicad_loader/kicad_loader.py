@@ -12,13 +12,14 @@ prev_file_name = ""
 #downloads_dir = "C:\\Users\\sim\\Downloads"
 
 # Czytanie konfiguracji z 'config.json'
-with open("config.json", "r") as file:
+with open("/usr/bin/kicad_loader/config.json", "r") as file:
     data = json.load(file)
 
 # Zaczytywanie danych 
 version = data["version"]
 downloads_dir = data["source_dir"]
-tmp_dir = data["tmp_dir"]
+#tmp_dir = data["tmp_dir"]
+tmp_dir = "/tmp/kicad-loader-tmp"
 kicad_mod_dir = data["kicad_mod_dir"]
 model_dir = data["3dshapes_dir"]
 sym_lib_dir = data["sym_lib_dir"]
@@ -29,7 +30,7 @@ print("Wersja programu: ", version)
 
 while True:
     time.sleep(1)
-    # Czyszczenie downloads_diru 
+    # Czyszczenie tmp
     if os.path.exists(tmp_dir):
         for f in os.listdir(tmp_dir):
             p = os.path.join(tmp_dir, f)
@@ -50,7 +51,7 @@ while True:
         if files:
             zip_file = max(files, key=os.path.getmtime)
         else:
-            print("Brak plików w downloads_dirze.")
+            print("Brak plików w downloads_dir.")
 
         if zip_file != prev_file_name:
             print("Najnowszy plik to:", zip_file)
@@ -152,7 +153,7 @@ while True:
                     except Exception as e:
                         print(f"Błąd przy kopiowaniu {name}: {e}")
     except Exception as e:
-        print("Błąd zip")
+        print(f"Błąd: {e}")
     except KeyboardInterrupt:
             exit()
         

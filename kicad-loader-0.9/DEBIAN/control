@@ -1,5 +1,5 @@
 Package: kicad-loader
-Version: 0.4
+Version: 0.9
 Section: utils
 Priority: optional
 Architecture: all
