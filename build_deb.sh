@@ -7,8 +7,6 @@ VERSION=$1
 PREV_VERSION=$2
 ARCH="all"
 
-USER_HOME=$(eval echo "~$SUDO_USER")
-
 if [[ "$VERSION" == "--help" ]]; then
     echo "Użycie: ./build_deb.sh <nowa_wersja> <stara_wersja>"
     exit
@@ -23,15 +21,14 @@ rm -rf ${PKG_NAME}-${PREV_VERSION} ${PKG_NAME}-${PREV_VERSION}.deb
 # Struktura katalogów
 mkdir -p ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
 mkdir -p ${PKG_NAME}-${VERSION}/DEBIAN
-mkdir -p /tmp/kicad-loader-tmp
-mkdir -p ${PKG_NAME}-${VERSION}/home/${USER_HOME}/.config/kicad_loader
+mkdir -p ${PKG_NAME}-${VERSION}/usr/share/kicad_loader
 mkdir -p ${PKG_NAME}-${VERSION}/etc/systemd/system
 
 # Pliki aplikacji
 cp kicad_loader.py ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/
 chmod +x ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/kicad_loader.py
-cp config.json ${PKG_NAME}-${VERSION}/home/${USER_HOME}/.config/kicad_loader
-chmod +rw ${PKG_NAME}-${VERSION}/home/${USER_HOME}/.config/kicad_loader
+cp config.json ${PKG_NAME}-${VERSION}/usr/share/kicad_loader
+chmod +rw ${PKG_NAME}-${VERSION}/usr/share/kicad_loader/config.json
 cp kicad-loader.service ${PKG_NAME}-${VERSION}/etc/systemd/system
 
 # Wrapper w usr/bin
@@ -57,6 +54,29 @@ EOF
 cat <<'EOF' > ${PKG_NAME}-${VERSION}/DEBIAN/postinst
 #!/bin/bash
 set -e
+
+if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
+    USER_HOME=$(eval echo "~$SUDO_USER")
+    mkdir -p "$USER_HOME/.config/kicad_loader"
+    cp /usr/share/kicad_loader/config.json "$USER_HOME/.config/kicad_loader/"
+    chown "$SUDO_USER":"$SUDO_USER" "$USER_HOME/.config/kicad_loader/config.json"
+    echo "Konfiguracja została skopiowana do $USER_HOME/.config/kicad_loader/"
+fi
+
+read -p "Czy chcesz zainstalować i uruchomić usługę kicad-loader w systemd? (y/N): " choice
+case "$choice" in
+    y|Y )
+        systemctl daemon-reload
+        systemctl enable kicad-loader.service
+        systemctl start kicad-loader.service
+        echo "Usługa kicad-loader została włączona i uruchomiona."
+        echo "Do oglądania logów: sudo journalctl -u kicad-loader.service -f"
+        ;;
+    * )
+        echo "Pominięto instalację usługi systemd."
+        ;;
+esac
+
 exit 0
 EOF
 chmod +x ${PKG_NAME}-${VERSION}/DEBIAN/postinst

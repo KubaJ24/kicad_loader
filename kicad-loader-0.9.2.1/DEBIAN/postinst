@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
+    USER_HOME=$(eval echo "~$SUDO_USER")
+    mkdir -p "$USER_HOME/.config/kicad_loader"
+    cp /usr/share/kicad_loader/config.json "$USER_HOME/.config/kicad_loader/"
+    chown "$SUDO_USER":"$SUDO_USER" "$USER_HOME/.config/kicad_loader/config.json"
+    echo "Konfiguracja została skopiowana do $USER_HOME/.config/kicad_loader/"
+fi
+
+read -p "Czy chcesz zainstalować i uruchomić usługę kicad-loader w systemd? (y/N): " choice
+case "$choice" in
+    y|Y )
+        systemctl daemon-reload
+        systemctl enable kicad-loader.service
+        systemctl start kicad-loader.service
+        echo "Usługa kicad-loader została włączona i uruchomiona."
+        echo "Do oglądania logów: sudo journalctl -u kicad-loader.service -f"
+        ;;
+    * )
+        echo "Pominięto instalację usługi systemd."
+        ;;
+esac
+
+exit 0
