@@ -8,15 +8,13 @@ import time
 
 prev_file_name = ""
 
-#zip_file = "C:\\Users\\sim\\Downloads\\LIB_B550C-13-F.zip"
-#downloads_dir = "C:\\Users\\sim\\Downloads"
-
 # Czytanie konfiguracji z 'config.json'
-with open("/usr/bin/kicad_loader/config.json", "r") as file:
+with open("/etc/kicad_loader/config.json", "r") as file:
     data = json.load(file)
 
 # Zaczytywanie danych 
-version = data["version"]
+#version = data["version"]
+version = "0.9.2"
 downloads_dir = data["source_dir"]
 #tmp_dir = data["tmp_dir"]
 tmp_dir = "/tmp/kicad-loader-tmp"
@@ -92,15 +90,15 @@ while True:
                                         target.write(source.read())
 
                                     # Usuwanie pierwszej i ostatniej linii z pliku
-                                    with open(f"tmp/{filename}", "r") as f:
+                                    with open(f"{tmp_dir}/{filename}", "r") as f:
                                         lines = f.readlines()
                                         if lines:
                                             lines = lines[1:-1]
                                     # Zapisywanie zmian
-                                    with open(f"tmp/{filename}", "w") as f:
+                                    with open(f"{tmp_dir}/{filename}", "w") as f:
                                         f.writelines(lines)
 
-                                    with open(f"tmp/{filename}", "r") as f:
+                                    with open(f"{tmp_dir}/{filename}", "r") as f:
                                         symbol = f.read()
 
                                     with open(f"{sym_lib_dir}", "r") as f:
@@ -126,15 +124,15 @@ while True:
                                         target.write(source.read())
 
                                     # Usuwanie ostatniej linii z pliku
-                                    with open(f"tmp/{filename}", "r") as f:
+                                    with open(f"{tmp_dir}/{filename}", "r") as f:
                                         lines = f.readlines()
                                         if lines:
                                             lines = lines[:-1]
                                     # Zapisywanie zmian
-                                    with open(f"tmp/{filename}", "w") as f:
+                                    with open(f"{tmp_dir}/{filename}", "w") as f:
                                         f.writelines(lines)
 
-                                    with open(f"tmp/{filename}", "r") as f:
+                                    with open(f"{tmp_dir}/{filename}", "r") as f:
                                         lib_file = f.read()
 
                                     with open(f"{lib_dir}", "r") as f:

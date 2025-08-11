@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 PKG_NAME="kicad-loader"
 VERSION=$1
 PREV_VERSION=$2
@@ -20,13 +22,15 @@ rm -rf ${PKG_NAME}-${PREV_VERSION} ${PKG_NAME}-${PREV_VERSION}.deb
 mkdir -p ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader
 mkdir -p ${PKG_NAME}-${VERSION}/DEBIAN
 mkdir -p /tmp/kicad-loader-tmp
+mkdir -p ${PKG_NAME}-${VERSION}/etc/kicad_loader
+mkdir -p ${PKG_NAME}-${VERSION}/etc/systemd/system
 
 # Pliki aplikacji
 cp kicad_loader.py ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/
 chmod +x ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/kicad_loader.py
-cp config.json ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/
-chmod +rw ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/config.json
-cp kicad-loader.service /etc/systemd/system/
+cp config.json ${PKG_NAME}-${VERSION}/etc/kicad_loader
+chmod +rw ${PKG_NAME}-${VERSION}/etc/kicad_loader
+cp kicad-loader.service ${PKG_NAME}-${VERSION}/etc/systemd/system
 
 # Wrapper w usr/bin
 cat <<EOF > ${PKG_NAME}-${VERSION}/usr/bin/kicad-loader
