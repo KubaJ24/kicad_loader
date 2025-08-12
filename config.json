@@ -1,9 +1,10 @@
 {
-    "source_dir": "",
-    "sym_lib_dir": "",
-    "lib_dir": "",
-    "kicad_mod_dir": "",
-    "3dshapes_dir": "",
-    "tmp_dir": "",
+    "source_dir": "C:\\Users\\sim\\Downloads",
+    "sym_lib_dir": "C:\\Programy\\KiCad 9\\lib\\SamacSys_Parts.kicad_sym",
+    "lib_dir": "C:\\Programy\\KiCad 9\\lib\\SamacSys_Parts.lib",
+    "kicad_mod_dir": "C:\\Programy\\KiCad 9\\lib\\SamacSys_Parts.pretty",
+    "3dshapes_dir": "C:\\Programy\\KiCad 9\\lib\\SamacSys_Parts.3dshapes",
+    "tmp_dir": "C:\\Users\\sim\\Desktop\\Projekty\\RPi3\\kicad_loader\\tmp",
+    "element_list": "C:\\Programy\\KiCad 9\\lib\\SamacSys_element_list.txt",
     "extensions": [".kicad_sym", ".kicad_mod", ".lib", ".stp", ".step"]
 }

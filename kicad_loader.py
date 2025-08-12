@@ -11,21 +11,29 @@ user = os.getlogin()
 prev_file_name = ""
 
 # Czytanie konfiguracji z 'config.json'
-with open(f"/home/{user}/kicad_loader/config.json", "r") as file:
+#with open(f"/home/{user}/.config/kicad_loader/config.json", "r") as file:
+with open("config.json", "r") as file:
     data = json.load(file)
 
 # Zaczytywanie danych 
 #version = data["version"]
-version = "0.9.2"
+version = "0.9.2.1"
 downloads_dir = data["source_dir"]
 tmp_dir = data["tmp_dir"]
 kicad_mod_dir = data["kicad_mod_dir"]
 model_dir = data["3dshapes_dir"]
 sym_lib_dir = data["sym_lib_dir"]
 lib_dir = data["lib_dir"]
+element_list = data["element_list"]
 allowed_extensions = tuple(data["extensions"])
 
 print("Wersja programu: ", version)
+
+# Sprawdzanie czy istnieje lista plików 
+if not os.path.exists(element_list):
+    with open(element_list, 'w') as f:
+        pass
+    print(f"Utworzono plik: {element_list}")
 
 while True:
     time.sleep(1)
@@ -61,93 +69,100 @@ while True:
                 for name in zip_ref.namelist():
                     try:
                         if name.lower().endswith(allowed_extensions):
-                            # Footprinty
-                            if name.endswith(".kicad_mod"):
-                                filename = os.path.basename(name)
-                                target_path = os.path.join(kicad_mod_dir, filename)
+                            filename = os.path.basename(name)
 
-                                with zip_ref.open(name) as source, open(target_path, "wb") as target:
-                                    target.write(source.read())
+                            with open(element_list, "r", encoding = "utf-8") as f:
+                                lista_elementow_SamacSys = f.read()
 
-                                print("Rozpakowano:", filename, "do:", kicad_mod_dir)
+                            if filename in zawartosc:
+                                print(f"{filename} był już dodany do biblioteki")
+                            else:
+                                with open(element_list, "a", encoding="utf-8") as f:
+                                    f.write('\n' + filename)
 
-                            # Modele 3D
-                            if name.endswith(".stp" or ".step"):
-                                filename = os.path.basename(name)
-                                target_path = os.path.join(model_dir, filename)
-
-                                with zip_ref.open(name) as source, open(target_path, "wb") as target:
-                                    target.write(source.read())
-
-                                print("Rozpakowano:", filename, "do:", model_dir)
-                            
-                            # Symbole
-                            if name.endswith(".kicad_sym"):
-                                try:
-                                    filename = os.path.basename(name)
-                                    target_path = os.path.join(tmp_dir, filename)
+                                # Footprinty
+                                if name.endswith(".kicad_mod"):
+                                    target_path = os.path.join(kicad_mod_dir, filename)
 
                                     with zip_ref.open(name) as source, open(target_path, "wb") as target:
                                         target.write(source.read())
 
-                                    # Usuwanie pierwszej i ostatniej linii z pliku
-                                    with open(f"{tmp_dir}/{filename}", "r") as f:
-                                        lines = f.readlines()
-                                        if lines:
-                                            lines = lines[1:-1]
-                                    # Zapisywanie zmian
-                                    with open(f"{tmp_dir}/{filename}", "w") as f:
-                                        f.writelines(lines)
+                                    print("Rozpakowano:", filename, "do:", kicad_mod_dir)
 
-                                    with open(f"{tmp_dir}/{filename}", "r") as f:
-                                        symbol = f.read()
-
-                                    with open(f"{sym_lib_dir}", "r") as f:
-                                        sym_lib = f.read()
-                                        
-                                    new_sym_lib = sym_lib.rstrip()[:-1] + symbol + "\n)"
-
-                                    with open(f"{sym_lib_dir}", "w") as f:
-                                        f.write(new_sym_lib)
-
-                                    print(f"Dodano ", filename, "do ", sym_lib_dir)
-
-                                except Exception as e:
-                                    print(f"Błąd przy otwieraniu {filename}: {e}")
-
-                            # Plik lib
-                            if name.endswith(".lib"):
-                                try:
-                                    filename = os.path.basename(name)
-                                    target_path = os.path.join(tmp_dir, filename)
+                                # Modele 3D
+                                if name.endswith(".stp" or ".step"):
+                                    target_path = os.path.join(model_dir, filename)
 
                                     with zip_ref.open(name) as source, open(target_path, "wb") as target:
                                         target.write(source.read())
 
-                                    # Usuwanie ostatniej linii z pliku
-                                    with open(f"{tmp_dir}/{filename}", "r") as f:
-                                        lines = f.readlines()
-                                        if lines:
-                                            lines = lines[:-1]
-                                    # Zapisywanie zmian
-                                    with open(f"{tmp_dir}/{filename}", "w") as f:
-                                        f.writelines(lines)
+                                    print("Rozpakowano:", filename, "do:", model_dir)
+                                
+                                # Symbole
+                                if name.endswith(".kicad_sym"):
+                                    try:
+                                        target_path = os.path.join(tmp_dir, filename)
 
-                                    with open(f"{tmp_dir}/{filename}", "r") as f:
-                                        lib_file = f.read()
+                                        with zip_ref.open(name) as source, open(target_path, "wb") as target:
+                                            target.write(source.read())
 
-                                    with open(f"{lib_dir}", "r") as f:
-                                        lib = f.read()
+                                        # Usuwanie pierwszej i ostatniej linii z pliku
+                                        with open(f"{tmp_dir}/{filename}", "r") as f:
+                                            lines = f.readlines()
+                                            if lines:
+                                                lines = lines[1:-1]
+                                        # Zapisywanie zmian
+                                        with open(f"{tmp_dir}/{filename}", "w") as f:
+                                            f.writelines(lines)
 
-                                    new_lib_file = lib.rstrip()[:-1] + lib_file + "\n)"
+                                        with open(f"{tmp_dir}/{filename}", "r") as f:
+                                            symbol = f.read()
 
-                                    with open(f"{lib_dir}", "w") as f:
-                                        f.write(new_lib_file)
+                                        with open(f"{sym_lib_dir}", "r") as f:
+                                            sym_lib = f.read()
+                                            
+                                        new_sym_lib = sym_lib.rstrip()[:-1] + symbol + "\n)"
 
-                                    print(f"Dodano ", filename, "do ", lib_dir)
+                                        with open(f"{sym_lib_dir}", "w") as f:
+                                            f.write(new_sym_lib)
 
-                                except Exception as e:
-                                    print(f"Błąd przy otwieraniu {filename}: {e}")
+                                        print(f"Dodano ", filename, "do ", sym_lib_dir)
+
+                                    except Exception as e:
+                                        print(f"Błąd przy otwieraniu {filename}: {e}")
+
+                                # Plik lib
+                                if name.endswith(".lib"):
+                                    try:
+                                        target_path = os.path.join(tmp_dir, filename)
+
+                                        with zip_ref.open(name) as source, open(target_path, "wb") as target:
+                                            target.write(source.read())
+
+                                        # Usuwanie ostatniej linii z pliku
+                                        with open(f"{tmp_dir}/{filename}", "r") as f:
+                                            lines = f.readlines()
+                                            if lines:
+                                                lines = lines[:-1]
+                                        # Zapisywanie zmian
+                                        with open(f"{tmp_dir}/{filename}", "w") as f:
+                                            f.writelines(lines)
+
+                                        with open(f"{tmp_dir}/{filename}", "r") as f:
+                                            lib_file = f.read()
+
+                                        with open(f"{lib_dir}", "r") as f:
+                                            lib = f.read()
+
+                                        new_lib_file = lib.rstrip()[:-1] + lib_file + "\n)"
+
+                                        with open(f"{lib_dir}", "w") as f:
+                                            f.write(new_lib_file)
+
+                                        print(f"Dodano ", filename, "do ", lib_dir)
+
+                                    except Exception as e:
+                                        print(f"Błąd przy otwieraniu {filename}: {e}")
 
                     except Exception as e:
                         print(f"Błąd przy kopiowaniu {name}: {e}")
