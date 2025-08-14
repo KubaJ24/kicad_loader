@@ -24,6 +24,8 @@ mkdir -p ${PKG_NAME}-${VERSION}/DEBIAN
 mkdir -p ${PKG_NAME}-${VERSION}/usr/share/kicad_loader
 mkdir -p ${PKG_NAME}-${VERSION}/etc/systemd/system
 
+chmod 755 ${PKG_NAME}-${VERSION}/DEBIAN
+
 # Pliki aplikacji
 cp kicad_loader.py ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/
 chmod +x ${PKG_NAME}-${VERSION}/usr/bin/kicad_loader/kicad_loader.py
@@ -57,10 +59,14 @@ set -e
 
 if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
     USER_HOME=$(eval echo "~$SUDO_USER")
-    mkdir -p "$USER_HOME/.config/kicad_loader"
-    cp /usr/share/kicad_loader/config.json "$USER_HOME/.config/kicad_loader/"
-    chown "$SUDO_USER":"$SUDO_USER" "$USER_HOME/.config/kicad_loader/config.json"
-    echo "Konfiguracja została skopiowana do $USER_HOME/.config/kicad_loader/"
+    if [ ! -f "$USER_HOME/.config/kicad_loader/config.json" ]; then
+        mkdir -p "$USER_HOME/.config/kicad_loader"
+        cp /usr/share/kicad_loader/config.json "$USER_HOME/.config/kicad_loader/"
+        chown -R "$SUDO_USER":"$SUDO_USER" "$USER_HOME/.config/kicad_loader"
+        echo "Konfiguracja została skopiowana do $USER_HOME/.config/kicad_loader/"
+    else
+        echo "Znaleziono plik 'config.json' w $USER_HOME/.config/kicad_loader/"
+fi
 fi
 
 read -p "Czy chcesz zainstalować i uruchomić usługę kicad-loader w systemd? (y/N): " choice
@@ -80,6 +86,7 @@ exit 0
 EOF
 chmod +x ${PKG_NAME}-${VERSION}/DEBIAN/postinst
 
+sudo chmod 755 ${PKG_NAME}-${VERSION}/DEBIAN
 # Budowanie paczki
 dpkg-deb --build ${PKG_NAME}-${VERSION}
 echo "Paczka zbudowana: ${PKG_NAME}-${VERSION}.deb"

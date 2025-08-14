@@ -1,9 +1,0 @@
-{
-    "source_dir": "",
-    "sym_lib_dir": "",
-    "lib_dir": "",
-    "kicad_mod_dir": "",
-    "3dshapes_dir": "",
-    "tmp_dir": "",
-    "extensions": [".kicad_sym", ".kicad_mod", ".lib", ".stp", ".step"]
-}
