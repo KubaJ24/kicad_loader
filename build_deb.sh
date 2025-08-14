@@ -68,8 +68,7 @@ case "$choice" in
     y|Y )
         systemctl daemon-reload
         systemctl enable kicad-loader.service
-        systemctl start kicad-loader.service
-        echo "Usługa kicad-loader została włączona i uruchomiona."
+        echo "Usługa kicad-loader enabled"
         echo "Do oglądania logów: sudo journalctl -u kicad-loader.service -f"
         ;;
     * )

@@ -17,7 +17,7 @@ with open("config.json", "r") as file:
 
 # Zaczytywanie danych 
 #version = data["version"]
-version = "0.9.2.1"
+version = "0.9.2.2"
 downloads_dir = data["source_dir"]
 tmp_dir = data["tmp_dir"]
 kicad_mod_dir = data["kicad_mod_dir"]
@@ -74,7 +74,7 @@ while True:
                             with open(element_list, "r", encoding = "utf-8") as f:
                                 lista_elementow_SamacSys = f.read()
 
-                            if filename in zawartosc:
+                            if filename in lista_elementow_SamacSys:
                                 print(f"{filename} był już dodany do biblioteki")
                             else:
                                 with open(element_list, "a", encoding="utf-8") as f:
